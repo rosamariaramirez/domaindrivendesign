@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d84fc4c6-e1cc-48a4-a8b5-d5b9407a0b55</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="OneOf" Version="3.0.223" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BubberDinner.Application\BubberDinner.Application.csproj" />
+    <ProjectReference Include="..\BubberDinner.Contracts\BubberDinner.Contracts.csproj" />
+    <ProjectReference Include="..\BubberDinner.Infrastructure\BubberDinner.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
