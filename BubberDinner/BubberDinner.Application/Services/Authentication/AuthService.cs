@@ -2,7 +2,7 @@
 using BubberDinner.Application.Common.Interfaces.Authentication;
 using BubberDinner.Application.Common.Interfaces.Persistence;
 using BubberDinner.Domain.Entities;
-using OneOf;
+using FluentResults;
 
 namespace BubberDinner.Application.Services.Authentication
 {
@@ -37,13 +37,13 @@ namespace BubberDinner.Application.Services.Authentication
             return new AuthResult(user, token);
         }
 
-        public OneOf<AuthResult, IError> Register(string firstName, string lastName, string email, string password)
+        public Result<AuthResult> Register(string firstName, string lastName, string email, string password)
         {
             // 1. Validate user does not exist
 
             if (_userRepository.GetUserByEmail(email) is not null)
             {
-                return new DuplicateEmailError();
+                return Result.Fail<AuthResult>(new[] { new DuplicateEmailError() });
             }
 
             // 2. Create user (generate unique ID) && persist to DB
