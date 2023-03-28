@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-namespace BubberDinner.API.Errors
+namespace BubberDinner.API.Common.Errors
 {
     public class BubberDinnerProblemDetailsFactory: ProblemDetailsFactory
     {

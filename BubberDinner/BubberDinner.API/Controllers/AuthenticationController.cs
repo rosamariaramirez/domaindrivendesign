@@ -1,7 +1,7 @@
 ﻿using BubberDinner.Application.Common.Errors;
 using BubberDinner.Application.Services.Authentication;
 using BubberDinner.Contracts.Authentication;
-using FluentResults;
+using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BubberDinner.API.Controllers;
@@ -20,24 +20,16 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register")]
     public IActionResult Register(RegisterRequest request)
     {
-        Result<AuthResult> registerResult = _authService.Register(
+        ErrorOr<AuthResult> authResult = _authService.Register(
             request.FirstName,
             request.LastName,
             request.Email,
             request.Password);
 
-        if (registerResult.IsSuccess)
-        {
-            return Ok(MapAuthResult(registerResult.Value));
-        }
-
-        var firstError = registerResult.Errors.FirstOrDefault();
-        if (firstError is DuplicateEmailError)
-        {
-            return Problem(statusCode: StatusCodes.Status409Conflict, detail: "Email already exists");
-        }
-
-        return Problem();
+        return authResult.MatchFirst(
+            authResult => Ok(MapAuthResult(authResult)),
+            firstError => Problem(statusCode: StatusCodes.Status409Conflict, title: firstError.Description)
+            );
     }
 
     private static AuthenticationResponse MapAuthResult(AuthResult authResult)
@@ -57,13 +49,11 @@ public class AuthenticationController : ControllerBase
         var authResult = _authService.Login(
             request.Email,
             request.Password);
-        var response = new AuthenticationResponse(
-            authResult.user.Id,
-            authResult.user.FirstName,
-            authResult.user.LastName,
-            authResult.user.Email,
-            authResult.Token);
-        return Ok(response);
+
+        return authResult.MatchFirst(
+            authResult => Ok(MapAuthResult(authResult)),
+            firstError => Problem(statusCode: StatusCodes.Status409Conflict, title: firstError.Description)
+            );
     }
 }
 

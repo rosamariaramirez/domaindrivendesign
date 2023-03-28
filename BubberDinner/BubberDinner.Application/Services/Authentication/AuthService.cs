@@ -1,8 +1,9 @@
 ﻿using BubberDinner.Application.Common.Errors;
 using BubberDinner.Application.Common.Interfaces.Authentication;
 using BubberDinner.Application.Common.Interfaces.Persistence;
+using BubberDinner.Domain.Common.Errors;
 using BubberDinner.Domain.Entities;
-using FluentResults;
+using ErrorOr;
 
 namespace BubberDinner.Application.Services.Authentication
 {
@@ -17,19 +18,19 @@ namespace BubberDinner.Application.Services.Authentication
             _userRepository = userRepository;
         }
 
-        public AuthResult Login(string email, string password)
+        public ErrorOr<AuthResult> Login(string email, string password)
         {
             // 1. Validate user does exists
 
             if (_userRepository.GetUserByEmail(email) is not User user)
             {
-                throw new Exception("User does not exist.");
+                return Errors.Authentication.InvalidCredentials;
             }
 
             // 2. Validate the password is correct
             if (user.Password != password)
             {
-                throw new Exception("Invalid password.");
+                return new[] { Errors.Authentication.InvalidCredentials };
             }
 
             // 3. Create JWT token
@@ -37,13 +38,13 @@ namespace BubberDinner.Application.Services.Authentication
             return new AuthResult(user, token);
         }
 
-        public Result<AuthResult> Register(string firstName, string lastName, string email, string password)
+        public ErrorOr<AuthResult> Register(string firstName, string lastName, string email, string password)
         {
             // 1. Validate user does not exist
 
             if (_userRepository.GetUserByEmail(email) is not null)
             {
-                return Result.Fail<AuthResult>(new[] { new DuplicateEmailError() });
+                return Errors.User.DuplicateEmail;
             }
 
             // 2. Create user (generate unique ID) && persist to DB
