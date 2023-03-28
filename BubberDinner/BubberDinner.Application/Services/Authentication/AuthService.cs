@@ -37,7 +37,7 @@ namespace BubberDinner.Application.Services.Authentication
             return new AuthResult(user, token);
         }
 
-        public OneOf<AuthResult, DuplicateEmailError> Register(string firstName, string lastName, string email, string password)
+        public OneOf<AuthResult, IError> Register(string firstName, string lastName, string email, string password)
         {
             // 1. Validate user does not exist
 
